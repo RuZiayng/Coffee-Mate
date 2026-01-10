@@ -1,0 +1,8 @@
+{
+  "hvigor": {
+    "maxOldSpaceSize": 8192,
+    "pool": {
+      "maxSize": 4
+    }
+  }
+}

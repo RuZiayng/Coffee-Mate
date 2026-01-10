@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- 咖啡杯主体 -->
+  <path d="M30 40h60c5.5 0 10 4.5 10 10v20c0 5.5-4.5 10-10 10H30c-5.5 0-10-4.5-10-10V50c0-5.5 4.5-10 10-10z" 
+        fill="none" 
+        stroke="#D2B48C" 
+        stroke-width="4"/>
+  
+  <!-- 咖啡杯把手 -->
+  <path d="M90 50c0-5.5 4.5-10 10-10s10 4.5 10 10v10c0 5.5-4.5 10-10 10s-10-4.5-10-10V50z" 
+        fill="none" 
+        stroke="#D2B48C" 
+        stroke-width="4"/>
+  
+  <!-- 咖啡表面 -->
+  <ellipse cx="60" cy="50" rx="25" ry="8" 
+           fill="#5D3A10" 
+           opacity="0.8"/>
+  
+  <!-- 热气线条 -->
+  <path d="M50 30c0-5 5-10 10-10s10 5 10 10" 
+        fill="none" 
+        stroke="#F7944D" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        opacity="0.6"/>
+</svg>

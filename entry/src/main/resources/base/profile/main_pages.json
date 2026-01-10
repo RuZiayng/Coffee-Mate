@@ -1,0 +1,10 @@
+{
+  "src": [
+    "pages/Index",
+    "pages/SettingsPage",
+    "pages/EditSettingsPage",
+    "pages/onboarding/OnboardingFlow",
+    "pages/onboarding/SimpleOnboarding",
+    "pages/SimpleLogin"
+  ]
+}
