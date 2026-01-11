@@ -1,12 +1,19 @@
 // 咖啡因敏感度选择页面 - 按照新设计标准优化
 import { StepIndicator } from './components/StepIndicator';
+
+interface CardInfo {
+  title: string;
+  description: string;
+  tip: string;
+}
+
 @Component
 export struct SensitivityPage {
-  private onDataSelected: (value: string) => void = () => {};
-  private onBack: () => void = () => {};
-  @Link currentSensitivity: string;
-  private currentStep: number = 1;
-  private totalSteps: number = 6;
+  @Prop onDataSelected: (value: string) => void = () => {};
+  @Prop onBack: () => void = () => {};
+  @Prop currentSensitivity: string = 'medium';
+  @Prop currentStep: number = 1;
+  @Prop totalSteps: number = 6;
   
   @State private localSensitivity: string = 'medium';
   @State private isActive: boolean = false;
@@ -25,7 +32,6 @@ export struct SensitivityPage {
   
   onSensitivitySelect(sensitivity: string) {
     this.localSensitivity = sensitivity;
-    this.currentSensitivity = sensitivity;
     
     // 重置并启动自动跳转计时器
     if (this.jumpTimer) clearTimeout(this.jumpTimer);
@@ -55,28 +61,13 @@ export struct SensitivityPage {
         // 敏感度选择卡片
         Column({ space: 16 }) {
           // 低敏感度卡片
-          this.buildSensitivityCard(
-            'low',
-            '低敏感度',
-            '喝完咖啡后几乎无影响，可以正常入睡',
-            '适合经常饮用咖啡的用户'
-          )
+          this.buildSensitivityCard('low')
           
           // 中敏感度卡片
-          this.buildSensitivityCard(
-            'medium',
-            '中敏感度',
-            '下午3点后饮用可能影响睡眠',
-            '大多数人的标准敏感度'
-          )
+          this.buildSensitivityCard('medium')
           
           // 高敏感度卡片
-          this.buildSensitivityCard(
-            'high',
-            '高敏感度',
-            '少量咖啡因就会影响睡眠和心率',
-            '建议严格控制摄入时间和剂量'
-          )
+          this.buildSensitivityCard('high')
         }
         .width('90%')
         .margin({ top: 30, bottom: 40 })
@@ -126,9 +117,10 @@ export struct SensitivityPage {
   }
   
   @Builder
-  buildSensitivityCard(type: string, title: string, description: string, tip: string) {
+  buildSensitivityCard(type: string) {
     const isSelected = this.localSensitivity === type;
-    
+    const cardInfo = this.getCardInfo(type);
+
     Column() {
       Row() {
         // 选择指示器
@@ -139,12 +131,12 @@ export struct SensitivityPage {
           .margin({ right: 12 })
         
         Column({ space: 4 }) {
-          Text(title)
+          Text(cardInfo.title)
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
             .fontColor(isSelected ? '#FFB74D' : Color.White)
           
-          Text(description)
+          Text(cardInfo.description)
             .fontSize(14)
             .fontColor(isSelected ? '#B0B0B0' : '#666666')
         }
@@ -153,7 +145,7 @@ export struct SensitivityPage {
       }
       
       // 提示文本
-      Text(tip)
+      Text(cardInfo.tip)
         .fontSize(12)
         .fontColor('#4DB6AC')
         .alignSelf(ItemAlign.Start)
@@ -168,6 +160,35 @@ export struct SensitivityPage {
       color: isSelected ? '#FFB74D' : '#3A3A3A'
     })
     .onClick(() => this.onSensitivitySelect(type))
+  }
+
+  private getCardInfo(type: string): CardInfo {
+    switch (type) {
+      case 'low':
+        return {
+          title: '低敏感度',
+          description: '喝完咖啡后几乎无影响，可以正常入睡',
+          tip: '适合经常饮用咖啡的用户'
+        };
+      case 'medium':
+        return {
+          title: '中敏感度',
+          description: '下午3点后饮用可能影响睡眠',
+          tip: '大多数人的标准敏感度'
+        };
+      case 'high':
+        return {
+          title: '高敏感度',
+          description: '少量咖啡因就会影响睡眠和心率',
+          tip: '建议严格控制摄入时间和剂量'
+        };
+      default:
+        return {
+          title: '未知',
+          description: '',
+          tip: ''
+        };
+    }
   }
   
   private getSensitivityDescription(): string {

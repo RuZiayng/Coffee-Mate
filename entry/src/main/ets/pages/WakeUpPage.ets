@@ -57,97 +57,94 @@ struct WakeUpPage {
       console.error(`跳转失败：${err.code}-${err.message}`);
     });
   }
-
-
-
   build() {
     Column() {
-      // 步骤提示
-      Text('步骤 4/8')
-        .fontSize(14)
-        .fontColor($r('app.color.text_secondary'))
-        .margin({ top: 30, bottom: 20 })
+      Column() {
+        // 步骤提示
+        Text('步骤 4/8')
+          .fontSize(14)
+          .fontColor($r('app.color.text_secondary'))
+          .margin({ top: 30, bottom: 20 })
 
-      // 标题
-      Text('您通常几点起床？')
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('app.color.primary_color'))
+        // 标题
+        Text('您通常几点起床？')
+          .fontSize(24)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('app.color.primary_color'))
+          .margin({ bottom: 40 })
+
+        // 当前时间显示
+        Column({ space: 10 }) {
+          Text(this.wakeUpTime)
+            .fontSize(48)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r('app.color.accent_color'))
+
+          Text('起床时间')
+            .fontSize(14)
+            .fontColor($r('app.color.text_secondary'))
+        }
+        .alignItems(HorizontalAlign.Center)
         .margin({ bottom: 40 })
 
-      // 当前时间显示
-      Column({ space: 10 }) {
-        Text(this.wakeUpTime)
-          .fontSize(48)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('app.color.accent_color'))
-
-        Text('起床时间')
-          .fontSize(14)
-          .fontColor($r('app.color.text_secondary'))
-      }
-      .alignItems(HorizontalAlign.Center)
-      .margin({ bottom: 40 })
-
-      // 时间选择区域
-      Column({ space: 15 }) {
-        TextPicker({
-          range: this.generateTimeRange(),
-          selected: this.getSelectedIndex()
-        })
-          .width('80%')
-          .height(200)
-          .onChange((value: string | string[], index: number | number[]) => {
-            if (typeof value === 'string') {
-              this.onTimeChange(value);
-            } else if (Array.isArray(value) && value.length > 0) {
-              this.onTimeChange(value[0]);
-            }
+        // 时间选择区域
+        Column({ space: 15 }) {
+          TextPicker({
+            range: this.generateTimeRange(),
+            selected: this.getSelectedIndex()
           })
+            .width('80%')
+            .height(200)
+            .onChange((value: string | string[], index: number | number[]) => {
+              if (typeof value === 'string') {
+                this.onTimeChange(value);
+              } else if (Array.isArray(value) && value.length > 0) {
+                this.onTimeChange(value[0]);
+              }
+            })
+        }
+        .alignItems(HorizontalAlign.Center)
+        .margin({ bottom: 60 })
+
+        // 起床时间建议
+        Column({ space: 8 }) {
+          Text('起床时间建议：')
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('app.color.primary_color'))
+            .width('80%')
+            .textAlign(TextAlign.Start)
+
+          Text('• 建议起床后1小时内饮用第一杯咖啡')
+            .fontSize(12)
+            .fontColor($r('app.color.text_secondary'))
+            .width('80%')
+            .textAlign(TextAlign.Start)
+
+          Text('• 避免空腹饮用咖啡，可搭配早餐')
+            .fontSize(12)
+            .fontColor($r('app.color.text_secondary'))
+            .width('80%')
+            .textAlign(TextAlign.Start)
+        }
+        .alignItems(HorizontalAlign.Start)
+        .margin({ bottom: 40 })
+
+        // 跳转提示
+        if (this.showJumpHint) {
+          Text(this.jumpHintText)
+            .fontSize(14)
+            .fontColor($r('app.color.accent_color'))
+            .margin({ bottom: 20 })
+            .opacity(0.8)
+        }
       }
+      .width('100%')
+      .height('100%')
+      .backgroundColor($r('app.color.page_background'))
+      .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
-      .margin({ bottom: 60 })
-
-      // 起床时间建议
-      Column({ space: 8 }) {
-        Text('起床时间建议：')
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('app.color.primary_color'))
-          .width('80%')
-          .textAlign(TextAlign.Start)
-
-        Text('• 建议起床后1小时内饮用第一杯咖啡')
-          .fontSize(12)
-          .fontColor($r('app.color.text_secondary'))
-          .width('80%')
-          .textAlign(TextAlign.Start)
-
-        Text('• 避免空腹饮用咖啡，可搭配早餐')
-          .fontSize(12)
-          .fontColor($r('app.color.text_secondary'))
-          .width('80%')
-          .textAlign(TextAlign.Start)
-      }
-      .alignItems(HorizontalAlign.Start)
-      .margin({ bottom: 40 })
-
-      // 跳转提示
-      if (this.showJumpHint) {
-        Text(this.jumpHintText)
-          .fontSize(14)
-          .fontColor($r('app.color.accent_color'))
-          .margin({ bottom: 20 })
-          .opacity(0.8)
-      }
-
-
     }
-    .width('100%')
-    .height('100%')
-    .backgroundColor($r('app.color.page_background'))
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
   }
 
   // 生成时间范围 (05:00 - 12:00)

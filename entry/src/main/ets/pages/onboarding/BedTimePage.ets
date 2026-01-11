@@ -10,13 +10,18 @@ class TimeParts {
     this.minutes = minutes;
   }
 }
+
+interface PickerValue {
+  newSelected: number;
+}
+
 @Component
 export struct BedTimePage {
-  private onDataSelected: (value: string) => void = () => {};
-  private onBack: () => void = () => {};
-  @Link currentTime: string;
-  private currentStep: number = 1;
-  private totalSteps: number = 7;
+  @Prop onDataSelected: (value: string) => void = () => {};
+  @Prop onBack: () => void = () => {};
+  @Prop currentTime: string = '23:00';
+  @Prop currentStep: number = 1;
+  @Prop totalSteps: number = 7;
   
   @State private localTime: string = '23:00';
   @State private isActive: boolean = false;
@@ -36,7 +41,6 @@ export struct BedTimePage {
   onTimeChange(hours: number, minutes: number) {
     const selectedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     this.localTime = selectedTime;
-    this.currentTime = selectedTime;
     
     // 重置并启动自动跳转计时器
     if (this.jumpTimer) clearTimeout(this.jumpTimer);
@@ -55,7 +59,6 @@ export struct BedTimePage {
   
   build() {
     const timeParts = this.getCurrentTimeParts();
-    
     Column() {
       // 步骤指示器
       StepIndicator({
@@ -87,15 +90,13 @@ export struct BedTimePage {
               .fontSize(14)
               .fontColor('#B0B0B0')
               .margin({ bottom: 5 })
-            Picker({ type: 'text' })
-            .range(this.generateHourRange())
-            .selected(timeParts.hours - 20)
-            .height(120)
-            .width(80)
-            .onChange((value: { newValue: string, newSelected: number }) => {
-              const hours = value.newSelected + 20;
-              this.onTimeChange(hours, timeParts.minutes);
-            })
+            TextPicker({ range: this.generateHourRange(), selected: timeParts.hours - 20 })
+              .height(120)
+              .width(80)
+              .onChange((value: string | string[], index: number | number[]) => {
+                const hours = (index as number) + 20;
+                this.onTimeChange(hours, timeParts.minutes);
+              })
           }
           
           Text(':')
@@ -109,15 +110,13 @@ export struct BedTimePage {
               .fontSize(14)
               .fontColor('#B0B0B0')
               .margin({ bottom: 5 })
-            Picker({ type: 'text' })
-            .range(this.generateMinuteRange())
-            .selected(timeParts.minutes / 5)
-            .height(120)
-            .width(80)
-            .onChange((value: { newValue: string, newSelected: number }) => {
-              const minutes = value.newSelected * 5;
-              this.onTimeChange(timeParts.hours, minutes);
-            })
+            TextPicker({ range: this.generateMinuteRange(), selected: Math.floor(timeParts.minutes / 5) })
+              .height(120)
+              .width(80)
+              .onChange((value: string | string[], index: number | number[]) => {
+                const minutes = (index as number) * 5;
+                this.onTimeChange(timeParts.hours, minutes);
+              })
           }
         }
         .margin({ top: 30, bottom: 40 })
@@ -140,23 +139,25 @@ export struct BedTimePage {
       .alignItems(HorizontalAlign.Center)
       
       // 底部控制栏
-      Row() {
-        // "上一步"按钮
-        Button('上一步', { type: ButtonType.Normal })
-          .width(120)
-          .height(44)
-          .fontColor('#B0B0B0')
-          .backgroundColor('#2A2A2A')
-          .borderRadius(8)
-          .onClick(() => {
-            if (this.jumpTimer) clearTimeout(this.jumpTimer);
-            this.onBack();
-          })
+      Column() {
+        Row() {
+          // "上一步"按钮
+          Button('上一步', { type: ButtonType.Normal })
+            .width(120)
+            .height(44)
+            .fontColor('#B0B0B0')
+            .backgroundColor('#2A2A2A')
+            .borderRadius(8)
+            .onClick(() => {
+              if (this.jumpTimer) clearTimeout(this.jumpTimer);
+              this.onBack();
+            })
+        }
+        .width('100%')
+        .height(80)
+        .justifyContent(FlexAlign.Start)
+        .padding({ left: 24 })
       }
-      .width('100%')
-      .height(80)
-      .justifyContent(FlexAlign.Start)
-      .padding({ left: 24 })
     }
     .width('100%')
     .height('100%')

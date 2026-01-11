@@ -1,5 +1,11 @@
+
 // 体重输入页面 - 按照新设计标准优化
 import { StepIndicator } from './components/StepIndicator';
+
+interface PickerValue {
+  newSelected: number;
+}
+
 @Component
 export struct WeightPage {
   private onDataSelected: (value: number) => void = () => {};
@@ -72,14 +78,11 @@ export struct WeightPage {
           .fontSize(18)
           .fontColor('#B0B0B0')
           .margin({ bottom: 40 })
-        
         // 滚轮选择器
-        Picker({ type: 'text' })
-        .range(this.generateWeightRange())
-        .selected(this.localWeight - 40)
+        TextPicker({ range: this.generateWeightRange(), selected: this.localWeight - 40 })
         .height(180)
         .width('90%')
-        .onChange((value: { newValue: string, newSelected: number }) => this.onWeightChange(value.newSelected))
+        .onChange((value: string | string[], index: number | number[]) => this.onWeightChange(index as number))
         .margin({ top: 30, bottom: 40 })
         
         // 当前选择显示

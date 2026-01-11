@@ -1,5 +1,11 @@
+
 // 年龄输入页面 - 按照新设计标准优化
 import { StepIndicator } from './components/StepIndicator';
+
+interface PickerValue {
+  newSelected: number;
+}
+
 @Component
 export struct AgePage {
   private onDataSelected: (value: number) => void = () => {};
@@ -72,14 +78,11 @@ export struct AgePage {
           .fontSize(18)
           .fontColor('#B0B0B0')
           .margin({ bottom: 40 })
-        
         // 滚轮选择器
-        Picker({ type: 'text' })
-        .range(this.generateAgeRange())
-        .selected(this.localAge - 18)
+        TextPicker({ range: this.generateAgeRange(), selected: this.localAge - 18 })
         .height(180)
         .width('90%')
-        .onChange((value: { newValue: string, newSelected: number }) => this.onAgeChange(value.newSelected))
+        .onChange((value: string | string[], index: number | number[]) => this.onAgeChange(index as number))
         .margin({ top: 30, bottom: 40 })
         
         // 当前选择显示

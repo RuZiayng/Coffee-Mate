@@ -134,19 +134,16 @@ struct OnboardingFlow {
       console.error('Failed to complete onboarding:', error);
     }
   }
-  
   // 构建当前步骤组件
   @Builder
-  buildCurrentStepComponent(): void {
-    const step = this.steps[this.currentStep];
-    
-    if (step.name === 'welcome') {
+  buildCurrentStepComponent() {
+    if (this.steps[this.currentStep].name === 'welcome') {
       WelcomePage({
         onNext: () => this.goToNextStep(),
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'weight') {
+    } else if (this.steps[this.currentStep].name === 'weight') {
       WeightPage({
         onDataSelected: (value: number) => this.onStepDataSelected('weight', value),
         onBack: () => this.onBackStep(),
@@ -154,7 +151,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'age') {
+    } else if (this.steps[this.currentStep].name === 'age') {
       AgePage({
         onDataSelected: (value: number) => this.onStepDataSelected('age', value),
         onBack: () => this.onBackStep(),
@@ -162,7 +159,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'gender') {
+    } else if (this.steps[this.currentStep].name === 'gender') {
       GenderPage({
         onDataSelected: (value: string) => this.onStepDataSelected('gender', value),
         onBack: () => this.onBackStep(),
@@ -170,7 +167,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'wakeUp') {
+    } else if (this.steps[this.currentStep].name === 'wakeUp') {
       WakeUpPage({
         onDataSelected: (value: string) => this.onStepDataSelected('wakeUp', value),
         onBack: () => this.onBackStep(),
@@ -178,7 +175,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'bedTime') {
+    } else if (this.steps[this.currentStep].name === 'bedTime') {
       BedTimePage({
         onDataSelected: (value: string) => this.onStepDataSelected('bedTime', value),
         onBack: () => this.onBackStep(),
@@ -186,7 +183,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'sensitivity') {
+    } else if (this.steps[this.currentStep].name === 'sensitivity') {
       SensitivityPage({
         onDataSelected: (value: string) => this.onStepDataSelected('sensitivity', value),
         onBack: () => this.onBackStep(),
@@ -194,7 +191,7 @@ struct OnboardingFlow {
         currentStep: this.currentStep + 1,
         totalSteps: this.steps.length
       })
-    } else if (step.name === 'complete') {
+    } else if (this.steps[this.currentStep].name === 'complete') {
       CompletionPage({
         onBack: () => this.onBackStep(),
         currentStep: this.currentStep + 1,
@@ -206,25 +203,14 @@ struct OnboardingFlow {
       }
     }
   }
-  
   build() {
-    Stack() {
-      // 背景层
-      Column()
-        .width('100%')
-        .height('100%')
-        .backgroundColor('#0F1A2F')
-      
-      // 内容层
-      Column() {
-        this.buildCurrentStepComponent()
-      }
-      .width('100%')
-      .height('100%')
-      .opacity(this.isTransitioning ? 0.7 : 1)
-      .animation({ duration: 300, curve: Curve.EaseInOut })
+    Column() {
+      this.buildCurrentStepComponent()
     }
     .width('100%')
     .height('100%')
+    .backgroundColor('#0F1A2F')
+    .opacity(this.isTransitioning ? 0.7 : 1)
+    .animation({ duration: 300, curve: Curve.EaseInOut })
   }
 }

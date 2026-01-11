@@ -1,8 +1,8 @@
 // 步骤指示器组件 - 按照新设计标准优化
 @Component
 export struct StepIndicator {
-  private currentStep: number = 1;
-  private totalSteps: number = 7;
+  @Prop currentStep: number = 1;
+  @Prop totalSteps: number = 7;
   
   build() {
     Row() {
