@@ -3,6 +3,82 @@
     {
       "name": "start_window_background",
       "value": "#000000"
+    },
+    {
+      "name": "primary_color",
+      "value": "#A68B5C"
+    },
+    {
+      "name": "accent_color",
+      "value": "#FFB84D"
+    },
+    {
+      "name": "secondary_color",
+      "value": "#5A9D7A"
+    },
+    {
+      "name": "neutral_white",
+      "value": "#1A1A1A"
+    },
+    {
+      "name": "neutral_gray",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "text_primary",
+      "value": "#E8E5E1"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#AAAAAA"
+    },
+    {
+      "name": "text_tertiary",
+      "value": "#777777"
+    },
+    {
+      "name": "success_color",
+      "value": "#FFB84D"
+    },
+    {
+      "name": "warning_color",
+      "value": "#5A9D7A"
+    },
+    {
+      "name": "card_background",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "page_background",
+      "value": "#1A1A1A"
+    },
+    {
+      "name": "slider_track",
+      "value": "#444444"
+    },
+    {
+      "name": "button_background",
+      "value": "#333333"
+    },
+    {
+      "name": "progress_background",
+      "value": "#2D2D2D"
+    },
+    {
+      "name": "welcome_background",
+      "value": "#1A2A3A"
+    },
+    {
+      "name": "welcome_title",
+      "value": "#D4B88A"
+    },
+    {
+      "name": "welcome_subtitle",
+      "value": "#AAAAAA"
+    },
+    {
+      "name": "welcome_button",
+      "value": "#FF8C42"
     }
   ]
 }

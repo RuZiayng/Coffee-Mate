@@ -118,34 +118,34 @@ export struct SensitivityPage {
   
   @Builder
   buildSensitivityCard(type: string) {
-    const isSelected = this.localSensitivity === type;
-    const cardInfo = this.getCardInfo(type);
+    // Note: In @Builder methods, we cannot declare variables with const/let
+    // We'll use the values directly in the UI components
 
     Column() {
       Row() {
         // 选择指示器
         Circle({ width: 20, height: 20 })
-          .fill(isSelected ? '#FFB74D' : '#3A3A3A')
-          .stroke(isSelected ? '#FFB74D' : '#5A5A5A')
+          .fill(this.localSensitivity === type ? '#FFB74D' : '#3A3A3A')
+          .stroke(this.localSensitivity === type ? '#FFB74D' : '#5A5A5A')
           .strokeWidth(2)
           .margin({ right: 12 })
         
         Column({ space: 4 }) {
-          Text(cardInfo.title)
+          Text(this.getCardInfo(type).title)
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
-            .fontColor(isSelected ? '#FFB74D' : Color.White)
+            .fontColor(this.localSensitivity === type ? '#FFB74D' : Color.White)
           
-          Text(cardInfo.description)
+          Text(this.getCardInfo(type).description)
             .fontSize(14)
-            .fontColor(isSelected ? '#B0B0B0' : '#666666')
+            .fontColor(this.localSensitivity === type ? '#B0B0B0' : '#666666')
         }
         .alignItems(HorizontalAlign.Start)
         .flexGrow(1)
       }
       
       // 提示文本
-      Text(cardInfo.tip)
+      Text(this.getCardInfo(type).tip)
         .fontSize(12)
         .fontColor('#4DB6AC')
         .alignSelf(ItemAlign.Start)
@@ -153,11 +153,11 @@ export struct SensitivityPage {
     }
     .width('100%')
     .padding(16)
-    .backgroundColor(isSelected ? '#1E2A3A' : '#2A2A2A')
+    .backgroundColor(this.localSensitivity === type ? '#1E2A3A' : '#2A2A2A')
     .borderRadius(12)
     .border({
-      width: isSelected ? 2 : 1,
-      color: isSelected ? '#FFB74D' : '#3A3A3A'
+      width: this.localSensitivity === type ? 2 : 1,
+      color: this.localSensitivity === type ? '#FFB74D' : '#3A3A3A'
     })
     .onClick(() => this.onSensitivitySelect(type))
   }

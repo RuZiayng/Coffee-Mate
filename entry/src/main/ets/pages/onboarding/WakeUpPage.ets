@@ -78,7 +78,6 @@ export struct WakeUpPage {
   }
 
   build() {
-    const timeParts = this.getCurrentTimeParts();
     Column() {
       // 步骤指示器
       StepIndicator({
@@ -110,12 +109,12 @@ export struct WakeUpPage {
               .fontSize(14)
               .fontColor('#B0B0B0')
               .margin({ bottom: 5 })
-            TextPicker({ range: this.generateHourRange(), selected: timeParts.hours - 5 })
+            TextPicker({ range: this.generateHourRange(), selected: this.getCurrentTimeParts().hours - 5 })
               .height(120)
               .width(80)
               .onChange((value: string | string[], index: number | number[]) => {
                 const hours = (index as number) + 5;
-                this.onTimeChange(hours, timeParts.minutes);
+                this.onTimeChange(hours, this.getCurrentTimeParts().minutes);
               })
           }
 
@@ -130,19 +129,19 @@ export struct WakeUpPage {
               .fontSize(14)
               .fontColor('#B0B0B0')
               .margin({ bottom: 5 })
-            TextPicker({ range: this.generateMinuteRange(), selected: timeParts.minutes / 5 })
+            TextPicker({ range: this.generateMinuteRange(), selected: this.getCurrentTimeParts().minutes / 5 })
               .height(120)
               .width(80)
               .onChange((value: string | string[], index: number | number[]) => {
                 const minutes = (index as number) * 5;
-                this.onTimeChange(timeParts.hours, minutes);
+                this.onTimeChange(this.getCurrentTimeParts().hours, minutes);
               })
           }
         }
         .margin({ top: 30, bottom: 40 })
 
         // 时间描述
-        Text(this.getTimeDescription(timeParts.hours))
+        Text(this.getTimeDescription(this.getCurrentTimeParts().hours))
           .fontSize(16)
           .fontColor('#B0B0B0')
           .margin({ bottom: 20 })
