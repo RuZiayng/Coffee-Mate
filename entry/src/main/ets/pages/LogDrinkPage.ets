@@ -3,9 +3,9 @@ import { router } from '@kit.ArkUI';
 import { BeverageItem, BeverageDatabaseService } from '../model/BeverageItem';
 import { CaffeineRecord } from '../model/CaffeineRecord';
 import { PreferencesService } from '../services/PreferencesService';
-import { DatabaseService } from '../utils/DataManager';
+import { addIntakeRecord } from '../utils/DataManager';
+import { IntakeRecord } from '../utils/CaffeineCalculator';
 
-@Entry
 @Component
 struct LogDrinkPage {
   // 饮品数据
@@ -81,8 +81,13 @@ struct LogDrinkPage {
         caffeineAmount: beverage.caffeineContentMg
       });
       
-      // 保存记录
-      await DatabaseService.addRecord(record);
+      // 保存记录 - 将CaffeineRecord转换为IntakeRecord
+      const intakeRecord = new IntakeRecord(
+        record.caffeineAmount,
+        new Date(record.timestamp),
+        record.sourceName
+      );
+      await addIntakeRecord(intakeRecord);
       
       // 显示成功提示
       this.showSuccessToast(`已记录：${beverage.name}`);
@@ -155,12 +160,10 @@ struct LogDrinkPage {
       }
       .width('100%')
       .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-      
       // 搜索栏
       Search({
         value: this.searchText,
-        placeholder: '搜索饮品或品牌...',
-        icon: 'resources/base/media/ic_search.png'
+        placeholder: '搜索饮品或品牌...'
       })
       .onChange((value: string) => this.onSearchChange(value))
       .width('92%')
@@ -216,7 +219,7 @@ struct LogDrinkPage {
       } else if (this.filteredBeverages.length === 0) {
         // 无结果状态
         Column() {
-          Image('resources/base/media/ic_no_results.png')
+          Image($r('app.media.coffee_cup_icon'))
             .width(80)
             .height(80)
             .margin({ bottom: 16 })

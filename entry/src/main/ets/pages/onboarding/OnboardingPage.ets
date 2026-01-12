@@ -32,7 +32,7 @@ export struct OnboardingPage {
         WeightPage({
           currentStep: this.currentStep,
           totalSteps: this.totalSteps,
-          currentWeight: $userWeight,
+          currentWeight: this.userWeight,
           onDataSelected: (weight: number) => this.onDataSelected(weight),
           onBack: () => this.goToPreviousStep()
         })
@@ -40,7 +40,7 @@ export struct OnboardingPage {
         GenderPage({
           currentStep: this.currentStep,
           totalSteps: this.totalSteps,
-          currentGender: $userGender,
+          currentGender: this.userGender,
           onDataSelected: (gender: string) => this.onDataSelected(gender),
           onBack: () => this.goToPreviousStep()
         })
@@ -48,7 +48,7 @@ export struct OnboardingPage {
         AgePage({
           currentStep: this.currentStep,
           totalSteps: this.totalSteps,
-          currentAge: $userAge,
+          currentAge: this.userAge,
           onDataSelected: (age: number) => this.onDataSelected(age),
           onBack: () => this.goToPreviousStep()
         })
@@ -56,7 +56,7 @@ export struct OnboardingPage {
         WakeUpPage({
           currentStep: this.currentStep,
           totalSteps: this.totalSteps,
-          currentTime: $wakeUpTime,
+          currentTime: this.wakeUpTime,
           onDataSelected: (time: string) => this.onDataSelected(time),
           onBack: () => this.goToPreviousStep()
         })
@@ -64,7 +64,7 @@ export struct OnboardingPage {
         BedTimePage({
           currentStep: this.currentStep,
           totalSteps: this.totalSteps,
-          currentTime: $bedTime,
+          currentTime: this.bedTime,
           onDataSelected: (time: string) => this.onDataSelected(time),
           onBack: () => this.goToPreviousStep()
         })
@@ -82,7 +82,7 @@ export struct OnboardingPage {
   }
   
   // 处理数据选择
-  private onDataSelected(value: number | string) {
+  private onDataSelected(value: number | string): void {
     console.log(`Step ${this.currentStep} data selected:`, value);
     
     // 延迟跳转到下一步，让动画完成
@@ -92,7 +92,7 @@ export struct OnboardingPage {
   }
   
   // 跳转到下一步
-  private goToNextStep() {
+  private goToNextStep(): void {
     if (this.currentStep < 7) {
       this.currentStep++;
       console.log(`前进到步骤 ${this.currentStep}`);
@@ -100,7 +100,7 @@ export struct OnboardingPage {
   }
   
   // 返回上一步
-  private goToPreviousStep() {
+  private goToPreviousStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;
       console.log(`返回到步骤 ${this.currentStep}`);
@@ -108,8 +108,17 @@ export struct OnboardingPage {
   }
   
   // 保存用户数据到本地存储
-  private saveUserData() {
-    const userData = {
+  private saveUserData(): void {
+    interface UserData {
+      weight: number;
+      gender: string;
+      age: number;
+      wakeUpTime: string;
+      bedTime: string;
+      onboardingCompleted: boolean;
+    }
+    
+    const userData: UserData = {
       weight: this.userWeight,
       gender: this.userGender,
       age: this.userAge,

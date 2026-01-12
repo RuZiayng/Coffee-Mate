@@ -7,7 +7,6 @@ class RouteParams {
   userData?: UserData;
 }
 
-@Entry
 @Component
 struct SensitivityPage {
   @State private userData: UserData = new UserData();

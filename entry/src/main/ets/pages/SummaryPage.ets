@@ -1,7 +1,6 @@
 import { router } from '@kit.ArkUI';
 import { UserData } from '../model/UserData';
 
-@Entry
 @Component
 struct SummaryPage {
   @State private userData: UserData = new UserData();

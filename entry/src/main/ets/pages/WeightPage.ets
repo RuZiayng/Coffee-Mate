@@ -7,7 +7,6 @@ class RouteParams {
   userData?: UserData;
 }
 
-@Entry
 @Component
 struct WeightPage {
   @State private userData: UserData = new UserData();

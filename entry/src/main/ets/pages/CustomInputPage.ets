@@ -1,7 +1,7 @@
 // 自定义咖啡因输入页面
 import { router } from '@kit.ArkUI';
-import { CaffeineRecord } from '../model/CaffeineRecord';
-import { DatabaseService } from '../utils/DataManager';
+import { IntakeRecord } from '../utils/CaffeineCalculator';
+import { addIntakeRecord } from '../utils/DataManager';
 
 @Entry
 @Component
@@ -20,14 +20,10 @@ struct CustomInputPage {
       const sourceName = this.customName.trim() || `自定义饮品 (${this.caffeineAmount}mg)`;
       
       // 创建咖啡因记录
-      const record = new CaffeineRecord({
-        timestamp: Date.now(),
-        sourceName: sourceName,
-        caffeineAmount: this.caffeineAmount
-      });
+      const record = new IntakeRecord(this.caffeineAmount, new Date(), sourceName);
       
       // 保存记录
-      await DatabaseService.addRecord(record);
+      await addIntakeRecord(record);
       
       // 显示成功提示
       this.showSuccessToast(`已记录：${sourceName}`);
@@ -105,7 +101,7 @@ struct CustomInputPage {
           
           Text(`${this.caffeineAmount} mg`)
             .fontSize(48)
-            .fontWeight(FontWeight.Light)
+            .fontWeight(FontWeight.Lighter)
             .fontColor('#FFB74D')
             .margin({ bottom: 20 })
           
