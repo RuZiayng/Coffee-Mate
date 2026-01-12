@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import { getUserSettings, saveUserSettings, UserSettings } from '../utils/DataManager';
+import common from '@ohos.app.ability.common';
 
 // 定义选项接口
 interface Option {
@@ -28,13 +29,23 @@ struct EditSettingsPage {
     { label: '严格提醒', value: 'strict' }
   ];
 
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && (context as common.UIAbilityContext).abilityInfo) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
+
   async onPageShow() {
     await this.loadUserSettings();
   }
 
   async loadUserSettings() {
     try {
-      this.userSettings = await getUserSettings(getContext());
+      const context = this.getContext();
+      this.userSettings = await getUserSettings(context);
       // 创建新的对象副本
       this.originalSettings = new UserSettings();
       this.originalSettings.weight = this.userSettings.weight;
@@ -51,7 +62,8 @@ struct EditSettingsPage {
 
   async saveSettings() {
     try {
-      await saveUserSettings(getContext(), this.userSettings);
+      const context = this.getContext();
+      await saveUserSettings(context, this.userSettings);
       promptAction.showToast({ message: '设置已保存', duration: 2000 });
       router.back();
     } catch (error) {
@@ -246,7 +258,6 @@ struct EditSettingsPage {
             .type(InputType.Normal)
             .backgroundColor(Color.White)
             .borderRadius(8)
-
             .padding(10)
             .onChange((value: string) => {
               this.userSettings.wakeUpTime = value;
@@ -266,7 +277,6 @@ struct EditSettingsPage {
             .type(InputType.Normal)
             .backgroundColor(Color.White)
             .borderRadius(8)
-
             .padding(10)
             .onChange((value: string) => {
               this.userSettings.bedtime = value;

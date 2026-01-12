@@ -4,6 +4,7 @@ import { promptAction } from '@kit.ArkUI';
 import { IntakeRecord, CaffeineLevel, getCaffeineLevel } from '../utils/CaffeineCalculator';
 import { getUserSettings, getTodayIntakeRecords, addIntakeRecord, UserSettings } from '../utils/DataManager';
 import { PreferencesService } from '../services/PreferencesService';
+import common from '@ohos.app.ability.common';
 
 // 定义饮品选项接口
 interface BeverageOption {
@@ -37,6 +38,15 @@ struct Index {
     { name: '能量饮料', amount: 80 }
   ];
 
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && (context as common.UIAbilityContext).abilityInfo) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
+
   aboutToAppear() {
     this.checkOnboardingStatus();
     this.initializeData();
@@ -65,11 +75,13 @@ struct Index {
 
   async initializeData() {
     try {
+      const context = this.getContext();
+      
       // 获取用户设置
-      this.userSettings = await getUserSettings(getContext());
+      this.userSettings = await getUserSettings(context);
       
       // 获取今日摄入记录
-      this.intakeRecords = await getTodayIntakeRecords();
+      this.intakeRecords = await getTodayIntakeRecords(context);
       
       // 计算当前咖啡因含量
       this.updateCaffeineLevel();
@@ -119,11 +131,12 @@ struct Index {
 
   async addIntake(amount: number, beverageName: string) {
     try {
+      const context = this.getContext();
       const record = new IntakeRecord(amount, new Date(), beverageName);
-      await addIntakeRecord(record);
+      await addIntakeRecord(context, record);
       
       // 更新本地记录
-      this.intakeRecords = await getTodayIntakeRecords();
+      this.intakeRecords = await getTodayIntakeRecords(context);
       this.updateCaffeineLevel();
       
       promptAction.showToast({ message: `已记录 ${beverageName} ${amount}mg`, duration: 2000 });

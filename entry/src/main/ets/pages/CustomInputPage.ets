@@ -3,6 +3,7 @@ import { router } from '@kit.ArkUI';
 import { IntakeRecord } from '../utils/CaffeineCalculator';
 import { addIntakeRecord } from '../utils/DataManager';
 import { promptAction } from '@kit.ArkUI';
+import common from '@ohos.app.ability.common';
 
 @Entry
 @Component
@@ -11,6 +12,15 @@ struct CustomInputPage {
   @State customName: string = '';
   @State isRecording: boolean = false;
   
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && typeof context === 'object' && 'abilityInfo' in context) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
+  
   // 记录饮品摄入
   async onRecordDrink() {
     if (this.isRecording) return;
@@ -18,13 +28,14 @@ struct CustomInputPage {
     this.isRecording = true;
     
     try {
+      const context = this.getContext();
       const sourceName = this.customName.trim() || `自定义饮品 (${this.caffeineAmount}mg)`;
       
       // 创建咖啡因记录
       const record = new IntakeRecord(this.caffeineAmount, new Date(), sourceName);
       
       // 保存记录
-      await addIntakeRecord(record);
+      await addIntakeRecord(context, record);
       
       // 显示成功提示
       this.showSuccessToast(`已记录：${sourceName}`);

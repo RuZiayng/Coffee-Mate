@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { promptAction } from '@kit.ArkUI';
 import { saveUserSettings, UserSettings } from '../../utils/DataManager';
+import common from '@ohos.app.ability.common';
 
 @Entry
 @Component
@@ -23,6 +24,15 @@ struct SimpleOnboarding {
     '设置完成！开始追踪您的咖啡因摄入吧'
   ];
 
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && (context as common.UIAbilityContext).abilityInfo) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
+
   nextStep() {
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
@@ -39,7 +49,8 @@ struct SimpleOnboarding {
 
   async completeOnboarding() {
     try {
-      await saveUserSettings(getContext(), this.userData);
+      const context = this.getContext();
+      await saveUserSettings(context, this.userData);
       promptAction.showToast({ message: '设置完成', duration: 2000 });
       
       // 跳转到主页面
