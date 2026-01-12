@@ -1,5 +1,6 @@
 {
   "src": [
+    "pages/MainPage",
     "pages/Index",
     "pages/SettingsPage",
     "pages/EditSettingsPage",
