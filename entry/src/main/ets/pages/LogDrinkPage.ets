@@ -1,10 +1,12 @@
 // 智能饮品记录页面
 import { router } from '@kit.ArkUI';
+import { promptAction } from '@kit.ArkUI';
 import { BeverageItem, BeverageDatabaseService } from '../model/BeverageItem';
 import { CaffeineRecord } from '../model/CaffeineRecord';
 import { PreferencesService } from '../services/PreferencesService';
 import { addIntakeRecord } from '../utils/DataManager';
 import { IntakeRecord } from '../utils/CaffeineCalculator';
+import common from '@ohos.app.ability.common';
 
 @Component
 struct LogDrinkPage {
@@ -19,6 +21,15 @@ struct LogDrinkPage {
   
   // 加载状态
   @State isLoading: boolean = true;
+  
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && (context as common.UIAbilityContext).abilityInfo) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
   
   aboutToAppear() {
     this.loadBeverages();
@@ -74,6 +85,8 @@ struct LogDrinkPage {
   // 记录饮品摄入
   async onBeverageSelect(beverage: BeverageItem) {
     try {
+      const context = this.getContext();
+      
       // 创建咖啡因记录
       const record = new CaffeineRecord({
         timestamp: Date.now(),
@@ -87,7 +100,7 @@ struct LogDrinkPage {
         new Date(record.timestamp),
         record.sourceName
       );
-      await addIntakeRecord(intakeRecord);
+      await addIntakeRecord(context, intakeRecord);
       
       // 显示成功提示
       this.showSuccessToast(`已记录：${beverage.name}`);

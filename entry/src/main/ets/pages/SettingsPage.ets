@@ -2,6 +2,7 @@ import { router } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { UserData } from '../model/UserData';
 import { getUserSettings, saveUserSettings, UserSettings } from '../utils/DataManager';
+import common from '@ohos.app.ability.common';
 
 @Entry
 @Component
@@ -9,13 +10,23 @@ struct SettingsPage {
   @State private userData: UserData = new UserData();
   @State private userSettings: UserSettings = new UserSettings();
 
+  // 获取UIAbilityContext
+  private getContext(): common.UIAbilityContext {
+    const context = this.getUIContext().getHostContext();
+    if (context && (context as common.UIAbilityContext).abilityInfo) {
+      return context as common.UIAbilityContext;
+    }
+    throw new Error('Failed to get UIAbilityContext');
+  }
+
   async onPageShow() {
     await this.loadUserSettings();
   }
 
   async loadUserSettings() {
     try {
-      this.userSettings = await getUserSettings(getContext());
+      const context = this.getContext();
+      this.userSettings = await getUserSettings(context);
       
       // 同步到旧的UserData结构（兼容性）
       this.userData.weight = this.userSettings.weight;
@@ -281,7 +292,8 @@ struct SettingsPage {
           
           // 保存设置
           try {
-            await saveUserSettings(getContext(), this.userSettings);
+            const context = this.getContext();
+            await saveUserSettings(context, this.userSettings);
           } catch (error) {
             console.error('保存设置失败:', error);
           }

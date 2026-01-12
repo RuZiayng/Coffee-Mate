@@ -3,6 +3,11 @@ import { IntakeRecord } from './CaffeineCalculator';
 import common from '@ohos.app.ability.common';
 import preferences from '@ohos.data.preferences';
 
+// 偏好设置配置接口
+interface PreferencesOptions {
+  name: string;
+}
+
 // 用户设置类
 export class UserSettings {
   // 基础信息
@@ -30,43 +35,49 @@ export class UserSettings {
   }
 }
 
-// 数据管理工具类
+// 存储记录接口
+interface StoredRecord {
+  id: number;
+  amount: number;
+  time: string;
+  beverageName: string;
+}
+
+// 数据管理类
 export class DataManager {
   private static readonly STORAGE_KEY = 'caffeine_intake_records';
   private static readonly SETTINGS_KEY = 'user_settings';
-  
-  // 获取Preferences实例
-  private static async getPreferences(context: common.Context, key: string): Promise<preferences.Preferences> {
-    return await preferences.getPreferences(context, { name: key });
-  }
-  
+
   // 获取所有摄入记录
   static async getIntakeRecords(context: common.Context): Promise<IntakeRecord[]> {
     try {
-      const prefs = await this.getPreferences(context, this.STORAGE_KEY);
+      const options: PreferencesOptions = { name: DataManager.STORAGE_KEY };
+      const prefs = await preferences.getPreferences(context, options);
       const recordsJson = await prefs.get('records', '[]') as string;
       
-      if (recordsJson === '[]') {
+      if (!recordsJson || recordsJson === '[]') {
         return [];
       }
       
-      const recordsData = JSON.parse(recordsJson);
-      return recordsData.map((recordData: any) => 
-        new IntakeRecord(recordData.amount, new Date(recordData.time), recordData.beverageName)
-      );
+      const recordsData: StoredRecord[] = JSON.parse(recordsJson);
+      return recordsData.map((record: StoredRecord) => {
+        const intakeRecord = new IntakeRecord(record.amount, new Date(record.time), record.beverageName);
+        intakeRecord.id = record.id;
+        return intakeRecord;
+      });
     } catch (error) {
       console.error('获取记录失败:', error);
       return [];
     }
   }
-  
+
   // 获取今日摄入记录
   static async getTodayIntakeRecords(context: common.Context): Promise<IntakeRecord[]> {
     try {
       const records = await DataManager.getIntakeRecords(context);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       return records.filter(record => 
         record.time >= today
       );
@@ -75,26 +86,30 @@ export class DataManager {
       return [];
     }
   }
-  
+
   // 添加摄入记录
   static async addIntakeRecord(context: common.Context, record: IntakeRecord): Promise<boolean> {
     try {
-      const records = await this.getIntakeRecords(context);
+      const options: PreferencesOptions = { name: DataManager.STORAGE_KEY };
+      const prefs = await preferences.getPreferences(context, options);
+      const existingRecords = await DataManager.getIntakeRecords(context);
       
       // 为新记录生成ID
-      record.id = records.length > 0 ? Math.max(...records.map(r => r.id)) + 1 : 1;
+      if (record.id === 0) {
+        record.id = existingRecords.length > 0 ? Math.max(...existingRecords.map(r => r.id)) + 1 : 1;
+      }
       
-      // 添加新记录
-      records.push(record);
+      const updatedRecords = [...existingRecords, record];
+      const storedRecords: StoredRecord[] = updatedRecords.map((r): StoredRecord => {
+        return {
+          id: r.id,
+          amount: r.amount,
+          time: r.time.toISOString(),
+          beverageName: r.beverageName
+        };
+      });
       
-      // 保存到Preferences
-      const prefs = await this.getPreferences(context, this.STORAGE_KEY);
-      const recordsJson = JSON.stringify(records.map(r => ({
-        id: r.id,
-        amount: r.amount,
-        time: r.time.toISOString(),
-        beverageName: r.beverageName
-      })));
+      const recordsJson = JSON.stringify(storedRecords);
       
       await prefs.put('records', recordsJson);
       await prefs.flush();
@@ -106,7 +121,7 @@ export class DataManager {
       return false;
     }
   }
-  
+
   // 获取今日摄入总量
   static async getTodayIntake(context: common.Context): Promise<number> {
     try {
@@ -117,12 +132,13 @@ export class DataManager {
       return 0;
     }
   }
-  
+
   // 获取用户设置
   static async getUserSettings(context: common.Context): Promise<UserSettings> {
     try {
-      const prefs = await this.getPreferences(context, this.SETTINGS_KEY);
-      
+      const options: PreferencesOptions = { name: DataManager.SETTINGS_KEY };
+      const prefs = await preferences.getPreferences(context, options);
+
       const settings = new UserSettings();
       settings.weight = await prefs.get('weight', 0) as number;
       settings.age = await prefs.get('age', 0) as number;
@@ -136,19 +152,20 @@ export class DataManager {
       settings.soundNotifications = await prefs.get('soundNotifications', true) as boolean;
       settings.vibrationNotifications = await prefs.get('vibrationNotifications', true) as boolean;
       settings.nightMode = await prefs.get('nightMode', false) as boolean;
-      
+
       return settings;
     } catch (error) {
       console.error('获取用户设置失败:', error);
       return new UserSettings(); // 返回默认设置
     }
   }
-  
+
   // 保存用户设置
   static async saveUserSettings(context: common.Context, settings: UserSettings): Promise<boolean> {
     try {
-      const prefs = await this.getPreferences(context, this.SETTINGS_KEY);
-      
+      const options: PreferencesOptions = { name: DataManager.SETTINGS_KEY };
+      const prefs = await preferences.getPreferences(context, options);
+
       await prefs.put('weight', settings.weight);
       await prefs.put('age', settings.age);
       await prefs.put('gender', settings.gender);
@@ -161,7 +178,7 @@ export class DataManager {
       await prefs.put('soundNotifications', settings.soundNotifications);
       await prefs.put('vibrationNotifications', settings.vibrationNotifications);
       await prefs.put('nightMode', settings.nightMode);
-      
+
       await prefs.flush();
       console.log('用户设置保存成功');
       return true;
@@ -170,12 +187,13 @@ export class DataManager {
       return false;
     }
   }
-  
-  // 清除所有记录（用于测试）
+
+  // 清除所有记录
   static async clearAllRecords(context: common.Context): Promise<boolean> {
     try {
-      const prefs = await this.getPreferences(context, this.STORAGE_KEY);
-      await prefs.put('records', '[]');
+      const options: PreferencesOptions = { name: DataManager.STORAGE_KEY };
+      const prefs = await preferences.getPreferences(context, options);
+      await prefs.delete('records');
       await prefs.flush();
       console.log('所有记录已清除');
       return true;
@@ -185,16 +203,35 @@ export class DataManager {
     }
   }
   
-  // 清除用户设置（用于测试）
-  static async clearUserSettings(context: common.Context): Promise<boolean> {
+  // 清除过期记录（24小时前的记录）
+  static async clearExpiredRecords(context: common.Context): Promise<boolean> {
     try {
-      const prefs = await this.getPreferences(context, this.SETTINGS_KEY);
-      await prefs.clear();
+      const records = await DataManager.getIntakeRecords(context);
+      const now = new Date();
+      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      
+      const activeRecords = records.filter(record => record.time >= twentyFourHoursAgo);
+      
+      const options: PreferencesOptions = { name: DataManager.STORAGE_KEY };
+      const prefs = await preferences.getPreferences(context, options);
+      const storedRecords: StoredRecord[] = activeRecords.map((r): StoredRecord => {
+        return {
+          id: r.id,
+          amount: r.amount,
+          time: r.time.toISOString(),
+          beverageName: r.beverageName
+        };
+      });
+      
+      const recordsJson = JSON.stringify(storedRecords);
+      
+      await prefs.put('records', recordsJson);
       await prefs.flush();
-      console.log('用户设置已清除');
+      
+      console.log('过期记录已清除，保留记录数:', activeRecords.length);
       return true;
     } catch (error) {
-      console.error('清除用户设置失败:', error);
+      console.error('清除过期记录失败:', error);
       return false;
     }
   }
@@ -229,6 +266,6 @@ export async function clearAllRecords(context: common.Context): Promise<boolean>
   return DataManager.clearAllRecords(context);
 }
 
-export async function clearUserSettings(context: common.Context): Promise<boolean> {
-  return DataManager.clearUserSettings(context);
+export async function clearExpiredRecords(context: common.Context): Promise<boolean> {
+  return DataManager.clearExpiredRecords(context);
 }
