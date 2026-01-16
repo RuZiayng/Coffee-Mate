@@ -9,11 +9,11 @@ interface CardInfo {
 
 @Component
 export struct SensitivityPage {
-  @Prop onDataSelected: (value: string) => void = () => {};
-  @Prop onBack: () => void = () => {};
-  @Prop currentSensitivity: string = 'medium';
-  @Prop currentStep: number = 1;
-  @Prop totalSteps: number = 6;
+  private onDataSelected: (value: string) => void = (value: string) => {};
+  private onBack: () => void = () => {};
+  private currentSensitivity: string = 'medium';
+  private currentStep: number = 1;
+  private totalSteps: number = 6;
   
   @State private localSensitivity: string = 'medium';
   @State private isActive: boolean = false;

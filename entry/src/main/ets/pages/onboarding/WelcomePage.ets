@@ -7,6 +7,8 @@ export struct WelcomePage {
   private currentStep: number = 1;
   private totalSteps: number = 7;
   
+
+  
   @State private titleOpacity: number = 0;
   @State private subtitleOpacity: number = 0;
   @State private descriptionOpacity: number = 0;

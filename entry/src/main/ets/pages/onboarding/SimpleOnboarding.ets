@@ -24,13 +24,21 @@ struct SimpleOnboarding {
     '设置完成！开始追踪您的咖啡因摄入吧'
   ];
 
-  // 获取UIAbilityContext
-  private getContext(): common.UIAbilityContext {
-    const context = this.getUIContext().getHostContext();
-    if (context && (context as common.UIAbilityContext).abilityInfo) {
-      return context as common.UIAbilityContext;
+  // 获取UIAbilityContext - 安全获取方法
+  private getContext(): common.UIAbilityContext | null {
+    const uiContext = this.getUIContext();
+    if (!uiContext) {
+      console.error('Failed to get UIContext');
+      return null;
     }
-    throw new Error('Failed to get UIAbilityContext');
+    
+    const hostContext = uiContext.getHostContext();
+    if (hostContext && (hostContext as common.UIAbilityContext).abilityInfo) {
+      return hostContext as common.UIAbilityContext;
+    }
+    
+    console.error('Failed to get UIAbilityContext from host context');
+    return null;
   }
 
   nextStep() {
@@ -50,6 +58,12 @@ struct SimpleOnboarding {
   async completeOnboarding() {
     try {
       const context = this.getContext();
+      if (!context) {
+        console.error('无法获取上下文，设置保存失败');
+        promptAction.showToast({ message: '保存失败，请重试', duration: 2000 });
+        return;
+      }
+      
       await saveUserSettings(context, this.userData);
       promptAction.showToast({ message: '设置完成', duration: 2000 });
       

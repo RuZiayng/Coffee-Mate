@@ -14,6 +14,7 @@ export class PreferencesService {
     }
     return PreferencesService.instance;
   }
+  
   async initialize(context: common.UIAbilityContext): Promise<void> {
     try {
       const prefs = await preferences.getPreferences(context, { name: this.PREFERENCES_NAME });
@@ -23,6 +24,11 @@ export class PreferencesService {
       console.error('Failed to initialize PreferencesService:', error);
       throw new Error('PreferencesService initialization failed');
     }
+  }
+  
+  // 检查服务是否已初始化
+  isInitialized(): boolean {
+    return this.preferences !== null;
   }
   
   // 保存用户配置
@@ -53,7 +59,7 @@ export class PreferencesService {
   // 加载用户配置
   async loadUserProfile(): Promise<UserProfile> {
     if (!this.preferences) {
-      throw new Error('PreferencesService not initialized');
+      return new UserProfile();
     }
     
     try {

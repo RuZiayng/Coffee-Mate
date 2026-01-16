@@ -16,6 +16,19 @@ struct MainPage {
   async checkOnboardingStatus() {
     try {
       const prefsService = PreferencesService.getInstance();
+      
+      // 检查PreferencesService是否已初始化
+      if (!prefsService.isInitialized()) {
+        console.warn('PreferencesService not initialized, proceeding with default onboarding');
+        // 服务未初始化，默认跳转到引导流程
+        setTimeout(() => {
+          router.replaceUrl({ 
+            url: 'pages/onboarding/OnboardingFlow'
+          });
+        }, 3000);
+        return;
+      }
+      
       this.userProfile = await prefsService.loadUserProfile();
       
       // 检查用户是否已完成引导

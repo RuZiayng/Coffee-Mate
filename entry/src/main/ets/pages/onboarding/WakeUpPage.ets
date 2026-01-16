@@ -9,11 +9,13 @@ interface TimeParts {
 
 @Component
 export struct WakeUpPage {
-  @Prop onDataSelected: (value: string) => void = () => {};
-  @Prop onBack: () => void = () => {};
-  @Prop currentTime: string = '08:00';
-  @Prop currentStep: number = 1;
-  @Prop totalSteps: number = 7;
+  private onDataSelected: (value: string) => void = (value: string) => {};
+  private onBack: () => void = () => {};
+  private currentTime: string = '08:00';
+  private currentStep: number = 1;
+  private totalSteps: number = 7;
+  
+
 
   @State private localTime: string = '08:00';
   @State private isActive: boolean = false;

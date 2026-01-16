@@ -8,18 +8,18 @@ interface PickerValue {
 
 @Component
 export struct WeightPage {
-  private onDataSelected: (value: number) => void = () => {};
+  private onDataSelected: (value: number) => void = (value: number) => {};
   private onBack: () => void = () => {};
-  @Link currentWeight: number;
+  private currentWeight: number = 65;
   private currentStep: number = 1;
   private totalSteps: number = 6;
   
-  @State private localWeight: number = 65;
+
+  
   @State private isActive: boolean = false;
   private jumpTimer: number | null = null;
   
   aboutToAppear() {
-    this.localWeight = this.currentWeight;
     this.isActive = true;
   }
   
@@ -40,7 +40,6 @@ export struct WeightPage {
   
   onWeightChange(newIndex: number) {
     const selectedWeight = newIndex + 40; // Picker范围40-90kg
-    this.localWeight = selectedWeight;
     this.currentWeight = selectedWeight;
     
     // 重置并启动自动跳转计时器
@@ -69,7 +68,7 @@ export struct WeightPage {
           .margin({ bottom: 10 })
         
         // 当前选中值的大数字显示
-        Text(`${this.localWeight}`)
+        Text(`${this.currentWeight}`)
           .fontSize(72)
           .fontWeight(FontWeight.Lighter)
           .fontColor('#FFB74D')
@@ -79,17 +78,17 @@ export struct WeightPage {
           .fontColor('#B0B0B0')
           .margin({ bottom: 40 })
         // 滚轮选择器
-        TextPicker({ range: this.generateWeightRange(), selected: this.localWeight - 40 })
+        TextPicker({ range: this.generateWeightRange(), selected: this.currentWeight - 40 })
         .height(180)
         .width('90%')
         .onChange((value: string | string[], index: number | number[]) => this.onWeightChange(index as number))
         .margin({ top: 30, bottom: 40 })
         
         // 当前选择显示
-        Text(`已选择：${this.localWeight}公斤`)
+        Text(`已选择：${this.currentWeight}公斤`)
           .fontSize(16)
           .fontColor('#4DB6AC')
-          .opacity(this.localWeight ? 1 : 0)
+          .opacity(this.currentWeight ? 1 : 0)
           .animation({ duration: 300, curve: Curve.EaseInOut })
       }
       .flexGrow(1)

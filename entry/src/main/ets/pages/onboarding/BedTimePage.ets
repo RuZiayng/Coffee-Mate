@@ -17,11 +17,13 @@ interface PickerValue {
 
 @Component
 export struct BedTimePage {
-  @Prop onDataSelected: (value: string) => void = () => {};
-  @Prop onBack: () => void = () => {};
-  @Prop currentTime: string = '23:00';
-  @Prop currentStep: number = 1;
-  @Prop totalSteps: number = 7;
+  private onDataSelected: (value: string) => void = (value: string) => {};
+  private onBack: () => void = () => {};
+  private currentTime: string = '23:00';
+  private currentStep: number = 1;
+  private totalSteps: number = 7;
+  
+
   
   @State private localTime: string = '23:00';
   @State private isActive: boolean = false;

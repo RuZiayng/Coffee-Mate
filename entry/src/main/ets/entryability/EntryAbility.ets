@@ -1,6 +1,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { PreferencesService } from '../services/PreferencesService';
 
 const DOMAIN = 0x0000;
 
@@ -8,6 +9,17 @@ export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
       this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+      
+      // 初始化偏好存储服务 - 使用立即执行异步函数
+      const prefsService = PreferencesService.getInstance();
+      (async () => {
+        try {
+          await prefsService.initialize(this.context);
+          hilog.info(DOMAIN, 'testTag', 'PreferencesService initialized successfully');
+        } catch (error) {
+          hilog.error(DOMAIN, 'testTag', 'Failed to initialize PreferencesService: %{public}s', JSON.stringify(error));
+        }
+      })();
     } catch (err) {
       hilog.error(DOMAIN, 'testTag', 'Failed to set colorMode. Cause: %{public}s', JSON.stringify(err));
     }

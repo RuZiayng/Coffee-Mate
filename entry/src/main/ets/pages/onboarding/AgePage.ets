@@ -8,11 +8,13 @@ interface PickerValue {
 
 @Component
 export struct AgePage {
-  private onDataSelected: (value: number) => void = () => {};
+  private onDataSelected: (value: number) => void = (value: number) => {};
   private onBack: () => void = () => {};
-  @Link currentAge: number;
+  private currentAge: number = 25;
   private currentStep: number = 1;
   private totalSteps: number = 6;
+  
+
   
   @State private localAge: number = 25;
   @State private isActive: boolean = false;

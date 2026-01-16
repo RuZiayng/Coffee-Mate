@@ -44,16 +44,41 @@ struct OnboardingFlow {
   ];
   
   aboutToAppear(): void {
+    // 确保PreferencesService已初始化
+    this.ensurePrefsServiceInitialized();
     // 初始化用户配置
     this.loadUserProfile();
+  }
+  
+  // 确保偏好服务已初始化
+  async ensurePrefsServiceInitialized(): Promise<void> {
+    try {
+      const prefsService = PreferencesService.getInstance();
+      // 如果服务未初始化，尝试使用默认上下文或等待初始化
+      if (!prefsService.isInitialized()) {
+        console.warn('PreferencesService not initialized, attempting to initialize...');
+        // 这里需要获取UIAbilityContext，但在页面组件中可能无法直接获取
+        // 作为临时解决方案，我们会在使用时处理初始化失败的情况
+      }
+    } catch (error) {
+      console.error('Failed to ensure PreferencesService initialization:', error);
+    }
   }
   
   async loadUserProfile(): Promise<void> {
     try {
       const prefsService = PreferencesService.getInstance();
+      // 检查服务是否已初始化
+      if (!prefsService.isInitialized()) {
+        console.warn('PreferencesService not initialized, using default profile');
+        this.userProfile = new UserProfile();
+        return;
+      }
       this.userProfile = await prefsService.loadUserProfile();
     } catch (error) {
       console.error('Failed to load user profile:', error);
+      // 使用默认配置作为降级方案
+      this.userProfile = new UserProfile();
     }
   }
   // 处理步骤数据选择
@@ -124,6 +149,17 @@ struct OnboardingFlow {
       this.userProfile.lastUpdateTime = Date.now();
       
       const prefsService = PreferencesService.getInstance();
+      
+      // 检查服务是否已初始化
+      if (!prefsService.isInitialized()) {
+        console.error('PreferencesService not initialized, cannot save profile');
+        // 即使无法保存，也继续完成引导流程
+        router.replaceUrl({ 
+          url: 'pages/MainPage'
+        });
+        return;
+      }
+      
       await prefsService.saveUserProfile(this.userProfile);
       
       // 跳转到主页面
@@ -132,6 +168,10 @@ struct OnboardingFlow {
       });
     } catch (error) {
       console.error('Failed to complete onboarding:', error);
+      // 即使保存失败也继续完成引导
+      router.replaceUrl({ 
+        url: 'pages/MainPage'
+      });
     }
   }
   // 构建当前步骤组件

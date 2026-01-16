@@ -2,11 +2,13 @@
 import { StepIndicator } from './components/StepIndicator';
 @Component
 export struct GenderPage {
-  private onDataSelected: (value: string) => void = () => {};
+  private onDataSelected: (value: string) => void = (value: string) => {};
   private onBack: () => void = () => {};
-  @Link currentGender: string;
+  private currentGender: string = 'male';
   private currentStep: number = 1;
   private totalSteps: number = 6;
+  
+
   
   @State private localGender: string = 'male';
   @State private isActive: boolean = false;

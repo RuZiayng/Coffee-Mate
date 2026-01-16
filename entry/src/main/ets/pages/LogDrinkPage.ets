@@ -22,13 +22,21 @@ struct LogDrinkPage {
   // 加载状态
   @State isLoading: boolean = true;
   
-  // 获取UIAbilityContext
-  private getContext(): common.UIAbilityContext {
-    const context = this.getUIContext().getHostContext();
-    if (context && (context as common.UIAbilityContext).abilityInfo) {
-      return context as common.UIAbilityContext;
+  // 获取UIAbilityContext - 安全获取方法
+  private getContext(): common.UIAbilityContext | null {
+    const uiContext = this.getUIContext();
+    if (!uiContext) {
+      console.error('Failed to get UIContext');
+      return null;
     }
-    throw new Error('Failed to get UIAbilityContext');
+    
+    const hostContext = uiContext.getHostContext();
+    if (hostContext && (hostContext as common.UIAbilityContext).abilityInfo) {
+      return hostContext as common.UIAbilityContext;
+    }
+    
+    console.error('Failed to get UIAbilityContext from host context');
+    return null;
   }
   
   aboutToAppear() {
@@ -86,6 +94,11 @@ struct LogDrinkPage {
   async onBeverageSelect(beverage: BeverageItem) {
     try {
       const context = this.getContext();
+      if (!context) {
+        console.error('无法获取上下文，记录添加失败');
+        this.showErrorToast('记录失败，请重试');
+        return;
+      }
       
       // 创建咖啡因记录
       const record = new CaffeineRecord({
